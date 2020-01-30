@@ -1,21 +1,31 @@
+require('dotenv').config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 var User = require("../models").Users;
 const saltRounds = 10;
 
 handleLogin = (email, password, res) => {
-  //   let salt = bcrypt.genSaltSync(saltRounds);
-  //   let hash = bcrypt.hashSync(req.body.password, salt);
   let result = {};
   let status = 200;
   console.log("we are here");
   User.findOne({ where: { email: email } }).then(function(user, err) {
     if (!err && user) {
       // We could compare passwords in our model instead of below
-      console.log("the user is ", user);
       bcrypt
         .compare(password, user.password)
         .then(match => {
           if (match) {
+            // Create a token
+            const payload = { user: user.name, id: user.id };
+            const options = {
+              expiresIn: "3h",
+              issuer: "http://mutoromike.dev"
+            };
+            const secret = process.env.JWT_SECRET
+            console.log("env are", process.env.JWT_SECRET);
+            const token = jwt.sign(payload, secret, options);
+
+            result.token = token;
             result.status = status;
             result.result = user;
           } else {
@@ -34,7 +44,7 @@ handleLogin = (email, password, res) => {
     } else {
       status = 404;
       result.status = status;
-      result.error = "User not found"
+      result.error = "User not found";
       res.status(status).send(result);
     }
   });
