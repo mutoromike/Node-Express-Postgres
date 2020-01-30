@@ -15,6 +15,3 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   }
 };
-
-
-// Work on login here or create another file.
