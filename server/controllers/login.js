@@ -22,13 +22,16 @@ handleLogin = (email, password, res) => {
               issuer: "http://mutoromike.dev"
             };
             const secret = process.env.JWT_SECRET
-            console.log("env are", process.env.JWT_SECRET);
             const token = jwt.sign(payload, secret, options);
 
-            result.token = token;
             result.status = status;
-            result.result = user;
+            result.user = {
+                "userName": user.name,
+                "email": user.email,
+                "token": token
+            }
           } else {
+              console.log("we are hereeeeeee");
             status = 401;
             result.status = status;
             result.error = "Authentication error";

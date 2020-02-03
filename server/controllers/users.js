@@ -5,13 +5,27 @@ const saltRounds = 10;
 module.exports = {
   create(req, res) {
     let salt = bcrypt.genSaltSync(saltRounds);
-    let hash = bcrypt.hashSync(req.body.password, salt);
-    return User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: hash
+    let hashedPassword = bcrypt.hashSync(req.body.password, salt);
+    let result = {}
+    return User.findOrCreate({
+      where: { email: req.body.email },
+      defaults: { name: req.body.name, password: hashedPassword }
     })
-      .then(user => res.status(201).send(user))
-      .catch(error => res.status(400).send(error));
+      .then(function([user, created]) {
+        if (created) {
+          status = 201;
+          result.status = 201;
+          result.result = {
+            message: "User cuccessfully created"
+          };
+        } else {
+          status = 400;
+          result.status = 400;
+          result.error = "User already exists, please login";
+        }
+        res.status(status).send(result);
+      })
+    //   .then(user => res.status(status).send(result))
+      .catch(error => res.status(500).send(error));
   }
 };
