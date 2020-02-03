@@ -10,12 +10,10 @@ handleLogin = (email, password, res) => {
   console.log("we are here");
   User.findOne({ where: { email: email } }).then(function(user, err) {
     if (!err && user) {
-      // We could compare passwords in our model instead of below
       bcrypt
         .compare(password, user.password)
         .then(match => {
           if (match) {
-            // Create a token
             const payload = { user: user.name, id: user.id };
             const options = {
               expiresIn: "3h",
@@ -31,7 +29,6 @@ handleLogin = (email, password, res) => {
                 "token": token
             }
           } else {
-              console.log("we are hereeeeeee");
             status = 401;
             result.status = status;
             result.error = "Authentication error";

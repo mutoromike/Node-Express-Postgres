@@ -25,7 +25,6 @@ module.exports = {
         }
         res.status(status).send(result);
       })
-    //   .then(user => res.status(status).send(result))
       .catch(error => res.status(500).send(error));
   }
 };
